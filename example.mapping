@@ -1,0 +1,17 @@
+run:
+  input: "input/data.json" as json_data
+  input: "input/records.xml" as xml_data
+  output: "output/result.xml"
+
+  mapping:
+    source: json_data.record.entry.value
+    target: /Root/Item[Name="value"]/Value
+
+  mapping:
+    const: 10
+    target: /Root/Item[Name="count"]/Value
+
+  condition: json_data.record.entry.value != 0 and json_data.record.entry.value != null
+  mapping:
+    source: json_data.record.entry.value
+    target: /Root/Item[Name="value"]/Value

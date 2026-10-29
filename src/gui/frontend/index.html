@@ -1,0 +1,1107 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapping Config Generator</title>
+  <style>
+    :root {
+      font-family: Inter, system-ui, sans-serif;
+      background: #0f1115;
+      color: #e6e6e6;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin: 0 0 4px;
+    }
+
+    .sub {
+      color: #8b93a1;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    .panel {
+      background: #161a22;
+      border: 1px solid #262c38;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .panel h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #9aa4b2;
+      margin: 0 0 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      font-size: 11px;
+      color: #8b93a1;
+      padding: 4px 6px;
+    }
+
+    td {
+      padding: 4px 6px;
+      vertical-align: middle;
+    }
+
+    input,
+    select {
+      background: #0f1115;
+      color: #e6e6e6;
+      border: 1px solid #323a48;
+      border-radius: 5px;
+      padding: 5px 7px;
+      font-size: 13px;
+      width: 100%;
+      box-sizing: border-box;
+      font-family: ui-monospace, monospace;
+    }
+
+    input:focus,
+    select:focus {
+      outline: 1px solid #4f8cff;
+    }
+
+    .btn {
+      background: #242c3a;
+      color: #e6e6e6;
+      border: 1px solid #3a4456;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #2d3648;
+    }
+
+    .btn.primary {
+      background: #2f6fed;
+      border-color: #2f6fed;
+    }
+
+    .btn.primary:hover {
+      background: #3f7df5;
+    }
+
+    .btn.danger {
+      background: #3a2020;
+      border-color: #5c2f2f;
+      color: #f0b0b0;
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .rowdel {
+      background: none;
+      border: none;
+      color: #e07070;
+      cursor: pointer;
+      font-size: 15px;
+      padding: 2px 6px;
+    }
+
+    pre {
+      background: #0b0d11;
+      border: 1px solid #262c38;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 12px;
+      overflow: auto;
+      max-height: 260px;
+      white-space: pre;
+      font-family: ui-monospace, monospace;
+    }
+
+    .err {
+      color: #ff8080;
+    }
+
+    .ok {
+      color: #7ee0a0;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    label {
+      font-size: 12px;
+      color: #8b93a1;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .status {
+      color: #9aa4b2;
+      font-size: 12px;
+      margin-left: auto;
+      align-self: center;
+    }
+
+    .spinner {
+      display: none;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #323a48;
+      border-top-color: #4f8cff;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      align-self: center;
+      margin-left: 8px;
+    }
+
+    .spinner.on {
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .tab {
+      background: #161a22;
+      color: #9aa4b2;
+      border: 1px solid #262c38;
+      border-radius: 6px 6px 0 0;
+      padding: 8px 16px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: #1e2532;
+      color: #e6e6e6;
+      border-bottom: 2px solid #2f6fed;
+    }
+
+    .expand {
+      background: none;
+      border: none;
+      color: #8b93a1;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 4px;
+    }
+
+    .expand:hover {
+      color: #e6e6e6;
+    }
+
+    .grouphead td {
+      background: #141924;
+    }
+
+    .grouptoggle {
+      background: none;
+      border: none;
+      color: #c7ced9;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: inherit;
+      padding: 4px 0;
+    }
+
+    .grouptoggle:hover {
+      color: #e6e6e6;
+    }
+
+    .mapnum {
+      color: #5b6472;
+      font-size: 11px;
+      text-align: right;
+      vertical-align: middle;
+    }
+
+    .filelink {
+      color: #6ea8ff;
+      text-decoration: underline;
+      cursor: pointer;
+      font-family: ui-monospace, monospace;
+      font-size: 13px;
+      word-break: break-all;
+    }
+
+    .filelink:hover {
+      color: #9cc2ff;
+    }
+
+    .editpop {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      background: #161a22;
+      border: 1px solid #323a48;
+      border-radius: 8px;
+      padding: 12px;
+      width: min(560px, 92vw);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+    }
+
+    .editpop.open {
+      display: block;
+    }
+
+    .editpop h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #9aa4b2;
+      margin: 0 0 8px;
+    }
+
+    .editpop textarea {
+      width: 100%;
+      height: 150px;
+      max-height: 150px;
+      overflow: auto;
+      box-sizing: border-box;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal .box {
+      background: #161a22;
+      border: 1px solid #323a48;
+      border-radius: 10px;
+      padding: 18px;
+      width: min(700px, 92vw);
+    }
+
+    .modal textarea {
+      width: 100%;
+      height: 380px;
+      box-sizing: border-box;
+    }
+
+    .toasts {
+      position: fixed;
+      bottom: 12px;
+      left: 12px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: min(560px, 92vw);
+    }
+
+    .toast {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      background: #161a22;
+      border: 1px solid #323a48;
+      border-left: 3px solid #4f8cff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+    }
+
+    .toast span {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      overflow-y: auto;
+      max-height: 200px;
+      flex: 1;
+      font-family: ui-monospace, monospace;
+    }
+
+    .toast.ok {
+      border-left-color: #3fa35f;
+      color: #7ee0a0;
+    }
+
+    .toast.err {
+      border-left-color: #c25050;
+      color: #ff8080;
+    }
+
+    .toast .tx {
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0 2px;
+      opacity: .7;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="actions" style="margin:0 0 14px">
+    <button class="btn primary" id="generate">Generate mapping file</button>
+    <button class="btn" id="preview">Preview</button>
+    <button class="btn primary" id="run">Run exe</button>
+    <button class="btn danger" id="stop" disabled>Stop</button>
+    <span id="spinner" class="spinner"></span>
+    <span id="status" class="status">Ready</span>
+  </div>
+  <div class="toasts" id="toasts"></div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabMain">Mappings</button>
+    <button class="tab" id="tabOpts">Options</button>
+  </div>
+
+  <div id="pageOpts" style="display:none">
+
+    <div class="panel">
+      <h2>Output files</h2>
+      <div class="grid2">
+        <div>
+          <label>Mapping file (.mapping) to write / load</label>
+          <div style="display:flex;gap:8px">
+            <input id="cfgPath" value="config.mapping" style="flex:1;min-width:0" />
+            <button class="btn" id="selectCfg" title="Open a file picker to choose the .mapping file">Browse…</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:10px">
+        <div><label>Working directory (-C, optional)</label><input id="workdir" value=""
+            placeholder="empty = directory the Tauri GUI was started from" /></div>
+        <div>
+          <label>Output file (XML)</label>
+          <div style="display:flex;gap:8px">
+            <input id="outputPath" value="path/to/output.xml" style="flex:1;min-width:0" />
+            <button class="btn" id="selectOutput"
+              title="Open a save-file picker to choose where the XML output is written">Browse…</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">
+          <button class="btn" id="loadCfg" title="Read the .mapping file at the path above into the tables">Load mapping
+            file</button>
+          <label style="display:flex;align-items:center;gap:5px;margin:0 0 4px"><input type="checkbox" id="autoload"
+              checked style="width:auto">auto-load last file on start</label>
+        </div>
+      </div>
+      <input type="file" id="filePick" accept=".mapping,.txt" style="display:none" />
+    </div>
+
+  </div>
+
+  <div id="pageMain">
+
+    <div class="panel">
+      <h2>Inputs</h2>
+      <table id="inputsTable">
+        <thead>
+          <tr>
+            <th style="width:130px">Alias</th>
+            <th>File</th>
+            <th style="width:90px"></th>
+            <th style="width:34px"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="actions"><button class="btn" id="addInput">+ Add input</button></div>
+    </div>
+
+    <div class="panel">
+      <h2>Mappings</h2>
+      <div class="actions" style="margin:0 0 8px">
+        <input id="mapSearch" placeholder="Filter mappings (source, const, target, alias)…"
+          style="flex:1;min-width:160px">
+        <button class="btn" id="clearSearch">Clear</button>
+        <button class="btn" id="expandAll">Expand all</button>
+        <button class="btn" id="collapseAll">Collapse all</button>
+        <span id="mapCount" class="status"></span>
+      </div>
+      <table id="mapTable">
+        <thead>
+          <tr>
+            <th style="width:36px">#</th>
+            <th style="width:90px">Mode</th>
+            <th>Source (alias.path) / Const value</th>
+            <th>Target (XML path)</th>
+            <th style="width:34px"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="actions"><button class="btn" id="addMap">+ Add mapping</button></div>
+    </div>
+
+  </div>
+
+  <div class="modal" id="previewModal">
+    <div class="box">
+      <h2 style="font-size:14px;margin:0 0 10px">Generated mapping file</h2>
+      <textarea id="previewText" spellcheck="false"></textarea>
+      <div class="actions">
+        <button class="btn" id="copyCfg">Copy</button>
+        <button class="btn" id="closePreview">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="editpop" id="editModal">
+    <h2>Edit path</h2>
+    <textarea id="editText" spellcheck="false"></textarea>
+    <div class="actions">
+      <button class="btn primary" id="saveEdit">Save</button>
+      <button class="btn" id="closeEdit">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const inTauri = !!(window.__TAURI__ && window.__TAURI__.core);
+    const tauriInvoke = inTauri ? window.__TAURI__.core.invoke : null;
+
+    let inputRows = [
+      { alias: "json", path: "path/to/json.json" },
+      { alias: "excel", path: "path/to/excel.xlsx" }
+    ];
+    let mapRowId = 1;
+    function newMapRow(o) { o.id = mapRowId++; return o; }
+    let mapRows = [
+      newMapRow({ mode: "source", alias: "excel", path: "$Messwerte!GY3", target: '/XML/Path/test/Item[Name="test"]/Value' }),
+      newMapRow({ mode: "source", alias: "json", path: "data.order.color.rgb", target: '/XML/Path/test/Item[Name="rgb"]/Value' }),
+      newMapRow({ mode: "const", value: "YES", target: '/XML/Path/test/Item[Name="constant"]/Value' })
+    ];
+
+    const inputsBody = document.querySelector("#inputsTable tbody");
+    const mapBody = document.querySelector("#mapTable tbody");
+
+    function saveState() {
+      localStorage.setItem("gui_state", JSON.stringify({
+        inputRows: inputRows,
+        // unapplied mappings (Apply not pressed) are never persisted —
+        // they are gone after closing the GUI
+        mapRows: mapRows.filter(r => !r.new),
+        outputPath: document.getElementById("outputPath").value
+      }));
+      // keep the settings file in sync — the option fields are also changed
+      // programmatically (Browse…, file loads), not only by typing
+      ["cfgPath", "workdir", "outputPath"].forEach(id => {
+        const v = document.getElementById(id).value;
+        if (optFile[id] !== v) { optFile[id] = v; scheduleOptSave(); }
+      });
+      scheduleAutoSave();
+    }
+
+    // ---- automatic saving of the mapping file ----
+    let autoSaveTimer = null;
+    let fileDirty = false;
+    function scheduleAutoSave() {
+      fileDirty = true;
+      if (!inTauri) return;
+      if (autoSaveTimer) clearTimeout(autoSaveTimer);
+      // debounce: writes at most one file per 900 ms of editing
+      autoSaveTimer = setTimeout(() => saveMappingFile(true), 900);
+    }
+
+    async function saveMappingFile(quiet = false) {
+      if (!inTauri) {
+        if (!quiet) toast("Browser mode: automatic saving requires the Tauri build.", "err");
+        return;
+      }
+      const cfgPath = document.getElementById("cfgPath").value.trim();
+      if (!cfgPath) return;
+      try {
+        await tauriInvoke("write_config", { path: cfgPath, content: buildConfig() });
+        localStorage.setItem("lastCfgPath", cfgPath);
+        optFile.cfgPath = cfgPath;
+        scheduleOptSave();
+        fileDirty = false;
+        setStatus("Auto-saved", false);
+        setTimeout(() => { if (statusEl.textContent === "Auto-saved") setStatus("Ready", false); }, 2000);
+      } catch (err) {
+        fileDirty = true;
+        if (quiet) {
+          setStatus(`Save skipped — cannot write: ${cfgPath}`, false);
+          setTimeout(() => { if (statusEl.textContent.startsWith("Save skipped")) setStatus("Ready", false); }, 5000);
+        } else {
+          toast(`Failed to save mapping file: ${err}`, "err");
+        }
+      }
+    }
+
+    // last-chance flush when the window closes
+    window.addEventListener("beforeunload", () => {
+      if (!inTauri) return;
+      try {
+        if (fileDirty) {
+          tauriInvoke("write_config", { path: document.getElementById("cfgPath").value, content: buildConfig() });
+        }
+        // flush pending option changes immediately (the debounce may not have fired)
+        tauriInvoke("write_settings", { content: JSON.stringify(optFile) });
+      } catch (e) { /* fire and forget */ }
+    });
+    function restoreState() {
+      try {
+        const s = JSON.parse(localStorage.getItem("gui_state") || "null");
+        if (!s) return false;
+        if (Array.isArray(s.inputRows) && s.inputRows.length) inputRows = s.inputRows;
+        if (Array.isArray(s.mapRows) && s.mapRows.length) {
+          mapRows = s.mapRows.map(r => r.id ? r : newMapRow(r));
+          mapRowId = Math.max(1, ...mapRows.map(r => r.id || 0)) + 1;
+        }
+        if (s.outputPath) document.getElementById("outputPath").value = s.outputPath;
+        return true;
+      } catch (e) { return false; } /* corrupted state -> ignore */
+    }
+
+    function esc(s) { return String(s ?? ""); }
+
+    function renderInputs() {
+      inputsBody.innerHTML = "";
+      inputRows.forEach((r, i) => {
+        const tr = document.createElement("tr");
+        // show only the file name as a clickable link; the full path is the tooltip
+        const name = String(r.path || "").split(/[\\/]/).pop() || "(no file set)";
+        tr.innerHTML = `
+      <td><input data-i="${i}" data-f="alias" value="${esc(r.alias).replace(/"/g, "&quot;")}"></td>
+      <td>
+        <a href="#" class="filelink" title="${esc(r.path).replace(/"/g, "&quot;")}">${esc(name)}</a>
+        <button class="expand" data-i="${i}" title="Edit path">&#9998;</button>
+      </td>
+      <td><button class="btn inputbrowse" data-i="${i}">Browse…</button></td>
+      <td><button class="rowdel" data-i="${i}">&#10005;</button></td>`;
+        tr.querySelectorAll("input,select").forEach(el => el.addEventListener("input", e => {
+          const _i = +e.target.dataset.i, _f = e.target.dataset.f, _old = inputRows[_i][_f];
+          inputRows[_i][_f] = e.target.value;
+          saveState();
+          if (_f === "alias") {
+            if (_old !== e.target.value) mapRows.forEach(r => { if (r.alias === _old) r.alias = e.target.value; });
+            renderMaps();
+          }
+        }));
+        // click on the file name opens the file with the OS default app
+        tr.querySelector(".filelink").addEventListener("click", e => {
+          e.preventDefault();
+          if (!r.path) { toast("No file path set for this input.", "err"); return; }
+          if (inTauri) {
+            tauriInvoke("open_path", { path: r.path }).catch(err => toast(`Failed to open: ${err}`, "err"));
+          } else {
+            toast("Opening files requires the Tauri build.", "err");
+          }
+        });
+        // pencil switches the link into an inline path editor
+        tr.querySelector(".expand").addEventListener("click", e => {
+          const td = e.target.closest("td");
+          td.innerHTML = `<input data-i="${i}" data-f="path" value="${esc(r.path).replace(/"/g, "&quot;")}">`;
+          const inp = td.querySelector("input");
+          inp.focus(); inp.select();
+          inp.addEventListener("input", ev => { inputRows[i].path = ev.target.value; saveState(); });
+          const done = () => renderInputs();
+          inp.addEventListener("blur", done);
+          inp.addEventListener("keydown", ev => { if (ev.key === "Enter") done(); });
+        });
+        // per-row file picker
+        tr.querySelector(".inputbrowse").addEventListener("click", async () => {
+          const dlg = tauriDialog();
+          if (dlg && dlg.open) {
+            const picked = await dlg.open({ multiple: false });
+            if (picked) { inputRows[i].path = picked; renderInputs(); renderMaps(); }
+          } else if (inTauri) {
+            toast("File dialog unavailable: install tauri-plugin-dialog and register it in main.rs.", "err");
+          } else {
+            toast("Browsing requires the Tauri build.", "err");
+          }
+        });
+        tr.querySelector(".rowdel").addEventListener("click", e => { inputRows.splice(+e.currentTarget.dataset.i, 1); renderInputs(); renderMaps(); });
+        inputsBody.appendChild(tr);
+      });
+      saveState();
+    }
+
+    let searchText = "";
+    let collapsedGroups = new Set();
+
+    function rowById(id) { return mapRows.find(r => r.id === +id); }
+    function mapGroupKey(r) {
+      return r.mode === "source" && r.alias ? r.alias : "(const)";
+    }
+
+    function mapRowTr(r) {
+      const tr = document.createElement("tr");
+      const num = mapRows.indexOf(r) + 1;
+      const srcCell = r.mode === "source"
+        ? `<div style="display:flex;gap:6px">
+         <select data-id="${r.id}" data-f="alias" style="width:110px;flex:none">
+           ${(() => { const opts = inputRows.map(x => x.alias); if (r.alias && !opts.includes(r.alias)) opts.push(r.alias); return opts.map(a => `<option ${r.alias === a ? "selected" : ""}>${esc(a)}</option>`).join(""); })()}
+         </select>
+         <input data-id="${r.id}" data-f="path" value="${esc(r.path).replace(/"/g, "&quot;")}" style="flex:1;min-width:0">
+         <button class="expand" data-id="${r.id}" data-f="${r.mode === "source" ? "path" : "value"}" title="Expand path">&#10530;</button>
+       </div>`
+        : `<input data-id="${r.id}" data-f="value" value="${esc(r.value).replace(/"/g, "&quot;")}" style="width:calc(100% - 28px)"><button class="expand" data-id="${r.id}" data-f="value" title="Expand value">&#10530;</button>`;
+      tr.innerHTML = `
+    <td class="mapnum">${num}</td>
+    <td><select data-id="${r.id}" data-f="mode">
+      <option value="source" ${r.mode === "source" ? "selected" : ""}>source</option>
+      <option value="const" ${r.mode === "const" ? "selected" : ""}>const</option>
+    </select></td>
+    <td>${srcCell}</td>
+    <td style="white-space:nowrap"><input data-id="${r.id}" data-f="target" value="${esc(r.target).replace(/"/g, "&quot;")}" style="width:calc(100% - 28px)"><button class="expand" data-id="${r.id}" data-f="target" title="Expand path">&#10530;</button></td>
+    <td style="white-space:nowrap">${r.new
+          ? `<button class="btn applyrow" data-id="${r.id}" title="Move this mapping into its group">Apply</button><button class="btn declinerow" data-id="${r.id}" style="margin-left:6px" title="Discard this mapping">Decline</button>`
+          : `<button class="rowdel" data-id="${r.id}" title="Delete this mapping">&#10005;</button>`}</td>`;
+      tr.querySelectorAll("input,select").forEach(el => el.addEventListener("input", e => {
+        const row = rowById(el.dataset.id);
+        if (!row) return;
+        const f = e.target.dataset.f;
+        if (f === "mode") { row.mode = e.target.value; renderMaps(); return; }
+        row[f] = e.target.value;
+        saveState();
+      }));
+      const applyBtn = tr.querySelector(".applyrow");
+      if (applyBtn) applyBtn.addEventListener("click", e => {
+        const row = rowById(e.currentTarget.dataset.id);
+        if (!row) return;
+        row.new = false; // groups it under its alias / const
+        renderMaps();
+      });
+      const declineBtn = tr.querySelector(".declinerow");
+      if (declineBtn) declineBtn.addEventListener("click", e => {
+        const i = mapRows.findIndex(x => x.id === +e.currentTarget.dataset.id);
+        if (i >= 0) mapRows.splice(i, 1);
+        renderMaps();
+      });
+      const delBtn = tr.querySelector(".rowdel");
+      if (delBtn) delBtn.addEventListener("click", e => {
+        const i = mapRows.findIndex(x => x.id === +e.currentTarget.dataset.id);
+        if (i >= 0) mapRows.splice(i, 1);
+        renderMaps();
+      });
+      return tr;
+    }
+
+    function renderMaps() {
+      mapBody.innerHTML = "";
+      const q = searchText.trim().toLowerCase();
+      const visible = q
+        ? mapRows.filter(r => [r.path, r.value, r.target, r.alias].some(v => String(v ?? "").toLowerCase().includes(q)))
+        : mapRows.slice();
+      document.getElementById("mapCount").textContent = `${visible.length} of ${mapRows.length} shown`;
+
+      const fresh = visible.filter(r => r.new);
+      const rest = visible.filter(r => !r.new);
+      if (fresh.length) {
+        const gh = document.createElement("tr");
+        gh.className = "grouphead";
+        gh.innerHTML = `<td colspan="5"><span class="grouptoggle" style="cursor:default">&#10010; New mappings (${fresh.length}) — press Apply to move a row into its group</span></td>`;
+        mapBody.appendChild(gh);
+        fresh.forEach(r => mapBody.appendChild(mapRowTr(r)));
+      }
+      const groups = new Map();
+      rest.forEach(r => {
+        const k = mapGroupKey(r);
+        if (!groups.has(k)) groups.set(k, []);
+        groups.get(k).push(r);
+      });
+      for (const [k, rows] of groups) {
+        const collapsed = collapsedGroups.has(k);
+        const gh = document.createElement("tr");
+        gh.className = "grouphead";
+        gh.innerHTML = `<td colspan="5"><button class="grouptoggle">${collapsed ? "\u25B8" : "\u25BE"} ${esc(k)} (${rows.length})</button></td>`;
+        gh.querySelector(".grouptoggle").addEventListener("click", () => {
+          if (collapsedGroups.has(k)) collapsedGroups.delete(k); else collapsedGroups.add(k);
+          renderMaps();
+        });
+        mapBody.appendChild(gh);
+        if (!collapsed) rows.forEach(r => mapBody.appendChild(mapRowTr(r)));
+      }
+      saveState();
+    }
+
+    function buildConfig() {
+      // the DSL grammar forbids backslashes in file paths entirely —
+      // Windows paths must be written with '/' separators (Python opens them fine)
+      const toSlash = s => String(s ?? "").replace(/\\/g, "/");
+      // const values are plain strings: escape backslash and double quote
+      const escStr = s => String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+      const lines = ["run:"];
+      inputRows.forEach(r => {
+        lines.push(`  input: "${toSlash(r.path)}" as ${r.alias}`);
+      });
+      lines.push(`  output: "${toSlash(document.getElementById("outputPath").value)}"`);
+      lines.push("");
+      mapRows.filter(r => !r.new).forEach(r => {
+        lines.push("  mapping:");
+        if (r.mode === "source") lines.push(`    source: ${r.alias}.${r.path}`);
+        else lines.push(`    const: "${escStr(r.value)}"`);
+        lines.push(`    target: ${r.target}`);
+      });
+      return lines.join("\n") + "\n";
+    }
+
+    document.getElementById("addInput").addEventListener("click", () => {
+      inputRows.push({ alias: "file" + (inputRows.length + 1), path: "" });
+      renderInputs(); renderMaps();
+    });
+    document.getElementById("addMap").addEventListener("click", () => {
+      const row = newMapRow({ mode: "source", alias: inputRows[0]?.alias || "json", path: "", target: "", new: true });
+      mapRows.push(row);
+      renderMaps();
+      const all = mapBody.querySelectorAll("tr");
+      if (all.length) all[all.length - 1].scrollIntoView({ block: "nearest" });
+    });
+    document.getElementById("mapSearch").addEventListener("input", e => { searchText = e.target.value; renderMaps(); });
+    document.getElementById("clearSearch").addEventListener("click", () => {
+      searchText = "";
+      document.getElementById("mapSearch").value = "";
+      renderMaps();
+    });
+    document.getElementById("expandAll").addEventListener("click", () => { collapsedGroups.clear(); renderMaps(); });
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      collapsedGroups = new Set(mapRows.map(mapGroupKey));
+      renderMaps();
+    });
+
+    const statusEl = document.getElementById("status");
+    function setStatus(msg, busy) {
+      statusEl.textContent = msg;
+      document.getElementById("spinner").classList.toggle("on", !!busy);
+      ["generate", "run"].forEach(id => document.getElementById(id).disabled = !!busy);
+    }
+
+    const toastsEl = document.getElementById("toasts");
+    function toast(msg, kind) {
+      const t = document.createElement("div");
+      t.className = "toast " + (kind || "");
+      const span = document.createElement("span");
+      span.style.cssText = "flex:1;white-space:pre-wrap";
+      span.textContent = msg;
+      const x = document.createElement("button");
+      x.className = "tx";
+      x.innerHTML = "&#10005;";
+      x.addEventListener("click", () => t.remove());
+      t.append(span, x);
+      toastsEl.appendChild(t);
+      setTimeout(() => t.remove(), kind === "err" ? 10000 : 5000);
+    }
+
+    let editing = null;
+    function openPathEditor(id, f, anchor) {
+      const row = rowById(id);
+      if (!row) return;
+      editing = { id: row.id, f };
+      document.getElementById("editText").value = row[f] ?? "";
+      const pop = document.getElementById("editModal");
+      pop.classList.add("open");
+      const r = anchor.getBoundingClientRect();
+      pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pop.offsetWidth - 12)) + "px";
+      pop.style.top = Math.max(8, Math.min(r.bottom + 6, window.innerHeight - pop.offsetHeight - 12)) + "px";
+      document.getElementById("editText").focus();
+    }
+    mapBody.addEventListener("click", e => {
+      const b = e.target.closest(".expand");
+      if (b) openPathEditor(b.dataset.id, b.dataset.f, b);
+    });
+    document.addEventListener("click", e => {
+      const pop = document.getElementById("editModal");
+      if (pop.classList.contains("open") && !pop.contains(e.target) && !e.target.closest(".expand"))
+        pop.classList.remove("open");
+    });
+    document.getElementById("saveEdit").addEventListener("click", () => {
+      if (editing) {
+        const row = rowById(editing.id);
+        if (row) row[editing.f] = document.getElementById("editText").value;
+        renderMaps();
+      }
+      document.getElementById("editModal").classList.remove("open");
+    });
+    document.getElementById("closeEdit").addEventListener("click", () =>
+      document.getElementById("editModal").classList.remove("open"));
+    document.getElementById("preview").addEventListener("click", () => {
+      document.getElementById("previewText").value = buildConfig();
+      document.getElementById("previewModal").classList.add("open");
+      saveMappingFile(); // saves immediately and shows the quiet indicator
+    });
+    document.getElementById("closePreview").addEventListener("click", () =>
+      document.getElementById("previewModal").classList.remove("open"));
+    document.getElementById("copyCfg").addEventListener("click", e => {
+      navigator.clipboard.writeText(document.getElementById("previewText").value);
+      e.target.textContent = "Copied";
+      setTimeout(() => e.target.textContent = "Copy", 1200);
+    });
+
+    document.getElementById("generate").addEventListener("click", async () => {
+      const cfgPath = document.getElementById("cfgPath").value;
+      const content = buildConfig();
+      setStatus("Writing mapping file…", true);
+      if (inTauri) {
+        try {
+          await tauriInvoke("write_config", { path: cfgPath, content });
+          localStorage.setItem("lastCfgPath", cfgPath);
+          optFile.cfgPath = cfgPath;
+          scheduleOptSave();
+          toast(`Mapping file written to ${cfgPath}`, "ok");
+        } catch (err) {
+          toast(`Failed to write config: ${err}`, "err");
+        }
+      } else {
+        const blob = new Blob([content], { type: "text/plain" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = cfgPath.split(/[\/]/).pop() || "config.mapping";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+      setStatus("Done", false);
+      if (!inTauri) toast("Config downloaded (browser mode)", "ok");
+    });
+    let runChild = null;
+    document.getElementById("run").addEventListener("click", async () => {
+      if (!inTauri) { toast("Running the exe requires the Tauri desktop build.", "err"); return; }
+      // converter exe lives next to the GUI start directory; the Rust backend
+      // resolves this relative name against the GUI working directory
+      const exePath = "converter.exe";
+      const cfgPath = document.getElementById("cfgPath").value;
+      const workdir = document.getElementById("workdir").value.trim();
+      const args = [cfgPath];
+      if (workdir) args.push("-C", workdir);
+      setStatus("Running converter…", true);
+      document.getElementById("run").textContent = "Running…";
+      document.getElementById("stop").disabled = false;
+      try {
+        // write config first, then run the converter on it
+        await tauriInvoke("write_config", { path: cfgPath, content: buildConfig() });
+        const res = await tauriInvoke("run_exe", { exePath, args });
+        if (res.code === 0) { setStatus("", false); toast("Successful", "ok"); }
+        else {
+          setStatus("", false);
+          toast(`Exit code ${res.code}${res.stderr ? ":\n" + String(res.stderr).trim() : ""}`, "err");
+        }
+      } catch (err) {
+        // covers: exe missing, spawn failure, non-zero exit mapped to error, panics
+        setStatus("", false);
+        toast(`Execution failed: ${err}`, "err");
+      } finally {
+        document.getElementById("stop").disabled = true;
+        runChild = null;
+        document.getElementById("run").textContent = "Run exe";
+      }
+    });
+    document.getElementById("stop").addEventListener("click", async () => {
+      if (inTauri) { try { await tauriInvoke("kill_run"); } catch (e) { } }
+    });
+
+    function parseConfig(text) {
+      const inputs = [];
+      const maps = [];
+      let output = "path/to/output.xml";
+      let cur = null;
+      const pushCur = () => { if (cur) { maps.push(cur); cur = null; } };
+      // const values only: \\ -> \, \" -> ", \n -> newline
+      // paths come back with '/' separators and are used as-is
+      const unesc = s => s.replace(/\\(.)/g, (m, c) => c === "n" ? "\n" : c);
+      for (const raw of text.split(/\r?\n/)) {
+        const line = raw.trim();
+        if (!line || line === "run:") continue;
+        let m = line.match(/^input:\s*"(.*)"\s+as\s+(\w+)\s*$/);
+        if (m) { inputs.push({ alias: m[2], path: m[1] }); continue; }
+        m = line.match(/^output:\s*"(.*)"\s*$/);
+        if (m) { output = m[1]; continue; }
+        if (line === "mapping:") { pushCur(); cur = newMapRow({ mode: "source", alias: inputs[0]?.alias || "json", path: "", value: "", target: "" }); continue; }
+        if (!cur) continue;
+        m = line.match(/^source:\s*(\w+)\.(.+)$/);
+        if (m) { cur.mode = "source"; cur.alias = m[1]; cur.path = m[2]; continue; }
+        m = line.match(/^const:\s*"(.*)"\s*$/);
+        if (m) { cur.mode = "const"; cur.value = unesc(m[1]); continue; }
+        m = line.match(/^target:\s*(.+)$/);
+        if (m) { cur.target = m[1]; continue; }
+      }
+      pushCur();
+      if (inputs.length) inputRows = inputs;
+      if (maps.length) mapRows = maps;
+      document.getElementById("outputPath").value = output;
+      renderInputs();
+      renderMaps();
+    }
+
+    async function loadConfigFrom(path) {
+      setStatus("Loading config…", true);
+      try {
+        const text = await tauriInvoke("read_config", { path });
+        parseConfig(text);
+        document.getElementById("cfgPath").value = path;
+        // track the loaded file in the settings file, not only in localStorage
+        optFile.cfgPath = path;
+        scheduleOptSave();
+        localStorage.setItem("lastCfgPath", path);
+        toast(`Loaded ${path}`, "ok");
+      } catch (err) {
+        toast(`Load failed: ${err}`, "err");
+      } finally {
+        setStatus("Ready", false);
+      }
+    }
+
+    const tauriDialog = () => (window.__TAURI__ && window.__TAURI__.dialog) || null;
+    document.getElementById("selectCfg").addEventListener("click", async () => {
+      const dlg = tauriDialog();
+      if (dlg && dlg.open) {
+        const picked = await dlg.open({
+          multiple: false,
+          filters: [{ name: "Mapping file", extensions: ["mapping"] }]
+        });
+        if (picked) loadConfigFrom(picked);
+      } else if (inTauri) {
+        toast("File dialog unavailable: install tauri-plugin-dialog and register it in main.rs.", "err");
+      } else {
+        document.getElementById("filePick").click();
+      }
+    });
+    document.getElementById("selectOutput").addEventListener("click", async () => {
+      const dlg = tauriDialog();
+      if (dlg && dlg.open) {
+        // only take the path — no file is created or saved here;
+        // the converter writes the XML when it runs
+        const picked = await dlg.open({
+          multiple: false,
+          directory: false,
+          filters: [{ name: "XML output", extensions: ["xml"] }]
+        });
+        if (picked) { document.getElementById("outputPath").value = picked; saveState(); }
+      } else if (inTauri) {
+        toast("File dialog unavailable: install tauri-plugin-dialog and register it in main.rs.", "err");
+      } else {
+        const inp = document.createElement("input");
+        inp.type = "file";
+        inp.accept = ".xml";
+        inp.addEventListener("change", () => {
+          if (inp.files[0]) { document.getElementById("outputPath").value = inp.files[0].name; saveState(); }
+        });
+        inp.click();
+      }
+    });
+    document.getElementById("filePick").addEventListener("change", e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      f.text().then(t => {
+        parseConfig(t);
+        document.getElementById("cfgPath").value = f.name;
+        toast(`Loaded ${f.name}`, "ok");
+      });
+    });
+    document.getElementById("loadCfg").addEventListener("click", () => {
+      const p = document.getElementById("cfgPath").value.trim();
+      if (!p) { toast("No mapping file path set.", "err"); return; }
+      if (inTauri) loadConfigFrom(p);
+      else document.getElementById("filePick").click();
+    });
+
+    const tabPages = { tabMain: "pageMain", tabOpts: "pageOpts" };
+    Object.keys(tabPages).forEach(id => document.getElementById(id).addEventListener("click", () => {
+      Object.keys(tabPages).forEach(t => document.getElementById(t).classList.toggle("active", t === id));
+      Object.values(tabPages).forEach(p => document.getElementById(p).style.display = "none");
+      document.getElementById(tabPages[id]).style.display = "block";
+    }));
+
+    // persist options (mapping file path, working directory, output path) in a
+    // settings file next to the GUI exe — file-backed, not localStorage-only
+    const persist = { cfgPath: "cfgPath", workdir: "workdir", outputPath: "outputPath" };
+    let optFile = {};
+    let optTimer = null;
+    let optSaveFailed = false;
+    function scheduleOptSave() {
+      if (!inTauri) return;
+      if (optTimer) clearTimeout(optTimer);
+      optTimer = setTimeout(async () => {
+        try { await tauriInvoke("write_settings", { content: JSON.stringify(optFile) }); }
+        catch (err) {
+          // surface the failure once — a silent settings loss is worse than a toast
+          if (!optSaveFailed) {
+            optSaveFailed = true;
+            toast(`Failed to write settings file: ${err}`, "err");
+          }
+        }
+      }, 400);
+    }
+
+    (async () => {
+      if (inTauri) {
+        try { optFile = JSON.parse(await tauriInvoke("read_settings")) || {}; }
+        catch (e) {
+          optFile = {};
+          if (!/os error 2|cannot find the file/i.test(String(e))) {
+            toast(`Could not read settings: ${e}`, "err");
+          }
+        }
+      }
+      Object.values(persist).forEach(id => {
+        const el = document.getElementById(id);
+        if (optFile[id] !== undefined) el.value = optFile[id];
+        else {
+          const saved = localStorage.getItem("opt_" + id);
+          if (saved !== null) el.value = saved;
+        }
+        el.addEventListener("input", () => {
+          optFile[id] = el.value;
+          localStorage.setItem("opt_" + id, el.value);
+          scheduleOptSave();
+          saveState();
+        });
+      });
+
+      restoreState();
+      if (optFile.outputPath !== undefined) document.getElementById("outputPath").value = optFile.outputPath;
+      renderInputs();
+      renderMaps();
+
+      // reload the last mapping file whenever autoload is checked —
+      // the file is auto-saved on every edit, so it is never older
+      // than the restored GUI state; hadState is no longer a reason to skip
+      const lastCfg = optFile.cfgPath || localStorage.getItem("lastCfgPath");
+      if (document.getElementById("autoload").checked && lastCfg) {
+        document.getElementById("cfgPath").value = lastCfg;
+        loadConfigFrom(lastCfg);
+      }
+    })();
+  </script>
+</body>
+
+</html>

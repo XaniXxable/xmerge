@@ -1,0 +1,88 @@
+start: _NL* run
+
+run: "run" ":" _NL _INDENT stmt+ _DEDENT
+
+?stmt: input
+        | output
+        | condition
+        | mapping
+
+input: "input" ":" STRING ["as" NAME] _NL
+
+output: "output" ":" STRING _NL
+
+condition: "condition" ":" expr _NL
+
+mapping: "mapping" ":" _NL _INDENT (source_field | const_field) target_field _DEDENT
+
+source_field: "source" ":" data_ref _NL
+
+const_field: "const" ":" literal _NL
+
+target_field: "target" ":" XML_PATH _NL
+
+?data_ref: dotted_ref
+        | xml_ref
+        | excel_ref
+
+excel_ref: NAME "." "$" SHEET "!" CELL
+
+xml_ref: NAME ":" XML_PATH
+
+// ---- expressions
+
+?expr: or_expr
+
+?or_expr: and_expr
+        | or_expr "or" and_expr -> or_
+
+?and_expr: cmp
+        | and_expr "and" cmp -> and_
+
+?cmp: atom
+        | atom CMP atom -> cmp
+
+?atom: literal
+        | dotted_ref
+        | "(" expr ")"
+
+dotted_ref: NAME ("." NAME)+
+
+literal: INT
+        | FLOAT
+        | STRING
+        | "true" -> true
+        | "false" -> false
+        | "null" -> null
+
+// ---- terminals
+
+NAME: /[A-Za-z_]\w*/
+
+INT: /-?\d+/
+
+FLOAT.2: /-?\d+\.\d+/
+
+CMP: "!="
+        | "=="
+        | "<="
+        | ">="
+        | "<"
+        | ">"
+
+XML_PATH: /\/[^\n]*/
+
+_NL: /(\r?\n[\t ]*)+/
+
+SHEET: /'[^']+'/
+        | /[\w][\w .]*(?=\s*!)/
+
+CELL: /[A-Za-z]{1,3}\d+(?::[A-Za-z]{1,3}\d+)?/
+
+%import common.ESCAPED_STRING -> STRING
+
+%declare _INDENT _DEDENT
+
+%ignore /[ \t]+/
+
+%ignore /[ \t]+/
