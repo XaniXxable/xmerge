@@ -11,6 +11,8 @@ The repository contains two components that work together:
 
 The frontend generates the `.mapping` script; the converter consumes it. Both can be used independently — the converter is a plain Python CLI.
 
+**Note:** The desktop frontend was developed with AI assistance (vibe coding) and is not hand-written production code. The Python converter is the manually developed, strictly typed core of this project.
+
 ## The DSL
 
 ```text
@@ -122,6 +124,3 @@ mapper.errors.DslSyntaxError: Indentation must be a multiple of 2 spaces, got 3 
 
 Structural bugs in the tool itself (grammar and builder out of sync) raise `RuntimeError`, not `DslError`, so they cannot be mistaken for user script errors.
 
-## Status
-
-Work in progress. Condition evaluation, mapping application, and XML output are under active development.
